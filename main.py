@@ -8,12 +8,10 @@ import re
 import random
 import matplotlib.pyplot as plt
 from matplotlib import rc
-import pandas as pd
-import numpy as np
 
 
 def get_random_colour():
-    return "#"+''.join([random.choice('0123456789ABCDEF') for j in range(6)])
+    return "#" + ''.join([random.choice('0123456789ABCDEF') for j in range(6)])
 
 
 def get_artist_name():
@@ -100,7 +98,7 @@ def pull_data(artist):
             changes = 0
             toChange = []
             for i in range(1, len(lyrics) - 1):
-                if lyrics[i].isupper() and lyrics[i-1] != " " and not lyrics[i-1].isupper():
+                if lyrics[i].isupper() and lyrics[i - 1] != " " and not lyrics[i - 1].isupper():
                     toChange.append(i + changes)
                     changes += 1
 
@@ -136,8 +134,7 @@ def count_words(data):
 
 
 def chart_data(data, name):
-
-    wordsToShow = int(input('How many of the top words would you like to see: '))
+    wordsToShow = int(input('How many of the top words would you like to see (-1 for all): '))
     wordsPerAlbum = []
     albumNames = []
 
@@ -150,6 +147,8 @@ def chart_data(data, name):
             else:
                 topWordsDict[cWord] += data[album][cWord]
 
+    if wordsToShow == -1:
+        wordsToShow = len(topWordsDict.items()) - 1
     topWords = sorted(topWordsDict.items(), key=lambda x: x[1], reverse=True)[:wordsToShow]
 
     for album in data.keys():
@@ -170,7 +169,8 @@ def chart_data(data, name):
     startHeights = [0 for i in range(wordsToShow)]
 
     for bar in range(len(albumNames)):
-        plt.bar(r, wordsPerAlbum[bar], bottom=startHeights, color=get_random_colour(), edgecolor='white', width=barWidth)
+        plt.bar(r, wordsPerAlbum[bar], bottom=startHeights, color=get_random_colour(), edgecolor='white',
+                width=barWidth)
 
         for i in range(wordsToShow):
             startHeights[i] += wordsPerAlbum[bar][i]
@@ -187,7 +187,6 @@ def chart_data(data, name):
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-
     artistName = get_artist_name()
 
     chart_data(count_words(pull_data(artistName)), artistName)
