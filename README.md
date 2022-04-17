@@ -3,7 +3,8 @@ Chart the fequency of words used by a given artist
 
 Quick project to practice webscrapping 
 
-Example output:
+
+**Example output:**
 
 Top 15 words for Joy Division
 ![image info](./freqPNG/joy_division_Figure.png)
