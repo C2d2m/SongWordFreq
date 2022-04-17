@@ -2,12 +2,12 @@
 # Chart the frequency of each word used by a given artist
 
 from bs4 import BeautifulSoup
+from matplotlib import rc
+import matplotlib.pyplot as plt
 import wikipediaapi
 import requests
 import re
 import random
-import matplotlib.pyplot as plt
-from matplotlib import rc
 
 
 def get_random_colour():
@@ -19,7 +19,6 @@ def get_artist_name():
 
 
 def pull_data(artist):
-    # TODO make way more robust
     wiki_wiki = wikipediaapi.Wikipedia('en')
 
     artistPage = wiki_wiki.page(artist)
@@ -91,7 +90,7 @@ def pull_data(artist):
 
             # Leaving this here for now just in case i missed anything in above regex
             if lyrics.__contains__('['):
-                print('wtf')
+                print('Unrecognized Character:')
                 print(lyrics)
                 exit()
 
@@ -164,7 +163,10 @@ def chart_data(data, name):
 
     rc('font', weight='bold')
     barWidth = 1
-    xLabel = [i[0] for i in topWords]
+    if len(topWords) > 25:
+        xLabel = []
+    else:
+        xLabel = [i[0] for i in topWords]
     r = [i for i in range(wordsToShow)]
     startHeights = [0 for i in range(wordsToShow)]
 
