@@ -31,16 +31,24 @@ def pull_data(artist):
         exit(-1)
 
     artistPage = artistPage.text
+    print(artistPage)
 
     # Reformat artist name for Genius url
     artist = artist.replace('_', '-')
 
     if artistPage.__contains__("Discography\nStudio albums"):
         discog = artistPage[artistPage.find('Discography\nStudio albums'):].split('\n')
-        del discog[:3]
-    else:
+    elif artistPage.__contains__("Discography\nAlbums"):
+        discog = artistPage[artistPage.find('Discography\nAlbums'):].split('\n')
+    elif artistPage.__contains__("Discography"):
         discog = artistPage[artistPage.find('Discography'):].split('\n')
-        del discog[0]
+    else:
+        discog = artistPage[artistPage.find('Albums'):].split('\n')
+
+    for i in range(len(discog)):
+        if discog[i].__contains__('('):
+            del discog[:i]
+            break
 
     albums = {}
     for line in discog:
@@ -81,7 +89,7 @@ def pull_data(artist):
             lyrics = lyricDiv[0].text
 
             # Disgusting parsing
-            lyrics = re.sub(r'\[([A-Za-z0-9_:\-$&!@*é ]+)]', '', lyrics)
+            lyrics = re.sub(r'\[([A-Za-z0-9_:\-$&!?;<>^+=|{}`~@*.,/\\é()#\'" ]+)]', '', lyrics)
 
             # Leaving this here for now just in case i missed anything in above regex
             if lyrics.__contains__('['):
@@ -112,6 +120,10 @@ def count_words(data):
         numWords[album] = {}
 
         for song in data[album]['songs'].keys():
+
+            if data[album]['songs'][song] is None:
+                continue
+
             words = data[album]['songs'][song].split(' ')
 
             for cWord in words:
@@ -123,7 +135,7 @@ def count_words(data):
     return numWords
 
 
-def chart_data(data):
+def chart_data(data, name):
 
     wordsToShow = int(input('How many of the top words would you like to see: '))
     wordsPerAlbum = []
@@ -163,8 +175,12 @@ def chart_data(data):
         for i in range(wordsToShow):
             startHeights[i] += wordsPerAlbum[bar][i]
 
+    plt.title(name)
     plt.xticks(r, xLabel, fontweight='bold')
     plt.xlabel('Words')
+    plt.legend(albumNames, loc='upper right')
+
+    plt.savefig('freqPNG/' + artistName + '_Figure.png')
 
     plt.show()
 
@@ -172,4 +188,6 @@ def chart_data(data):
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
 
-    chart_data(count_words(pull_data(get_artist_name())))
+    artistName = get_artist_name()
+
+    chart_data(count_words(pull_data(artistName)), artistName)
